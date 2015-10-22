@@ -263,6 +263,7 @@
       - Sets disabled property to false
     */
     enableFormElements: function(form) {
+      form.data('disabling', false);
       rails.formElements(form, rails.enableSelector).each(function() {
         rails.enableFormElement($(this));
       });
@@ -477,8 +478,14 @@
         return false;
 
       } else {
-        // slight timeout so that the submit button gets properly serialized
-        setTimeout(function(){ rails.disableFormElements(form); }, 13);
+         if(! form.data('disabling')){
+          e.preventDefault();
+          form.data('disabling', true);
+          // slight timeout so that the submit button gets properly serialized
+          setTimeout(function(){ rails.disableFormElements(form); }, 13);
+          // further timeout so Safari repaints the changes
+          setTimeout(function(){ form.submit(); }, 15);
+        }
       }
     });
 
